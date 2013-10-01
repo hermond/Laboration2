@@ -18,15 +18,12 @@ class Login {
 
     private $HTMLview;
     private $userModel;
-    private $username;
-    private $password;
 
     function __construct ()
     {
     $this->HTMLview = new HTMLview();
     $this->userModel = new user();
-    $this->username = $this->HTMLview->getUsernamePost();
-    $this->password = $this->HTMLview->getPasswordPost();
+
     }
 
     public function Controll()
@@ -38,19 +35,19 @@ class Login {
             $this->userModel->unsetSession();
             $this->HTMLview->setLogoutMessageSession();
             }
-            return $this->HTMLview->getIndexPage("Du har loggat ut","Du är nu utloggad", "");
+            return $this->HTMLview->getIndexPage();
         }
         else if ($this->userModel->isLoggedIn())
         {
-            return $this->HTMLview->getAdminPage("Inloggad", "");
+            return $this->HTMLview->getAdminPage();
         }
-        else if ($this->HTMLview->isLoggingIn())
+        else if ($this->HTMLview->isLoggingIn() && $this->HTMLview->isSubmitted())
         {
             return $this->validateLogin();
         }
         else
         {
-            return $this->HTMLview->getIndexPage("Välkommen", "", "");
+            return $this->HTMLview->getIndexPage();
         }
 
 
@@ -59,12 +56,14 @@ class Login {
     public function validateLogin()
     {
         try {
-            $this->userModel->userValidation($this->username, $this->password);
-            return $this->HTMLview->getAdminPage("Du är inloggad", "Inloggningen lyckades");
+            $this->userModel->userValidation($this->HTMLview->getUsernamePost(), $this->HTMLview->getPasswordPost());
+            $this->HTMLview->setLoginMessageSession();
+            return $this->HTMLview->getAdminPage();
         }
         catch (\Exception $e)
         {
-            return $this->HTMLview->getIndexPage($e->getMessage(), $e->getMessage() , $this->username);
+            $this->HTMLview->setErrorMessageSession($e->getMessage());
+            return $this->HTMLview->getIndexPage();
         }
 
 

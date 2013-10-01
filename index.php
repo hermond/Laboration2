@@ -13,7 +13,5 @@ require_once("controller/Login.php");
 
 session_start();
 
-$htmlView = new \view\HTMLview();
-$user = new \model\user();
 $Login = new \controller\Login();
 echo $Login->Controll();

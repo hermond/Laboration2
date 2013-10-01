@@ -11,15 +11,24 @@ namespace view;
 
 
 class HTMLview {
-    private $welcomeMessage = "Välkommen";
     private $loginMessage = "Du har loggats in";
     private $logoutMessage = "Du har loggats uuuut";
     private $message = "message";
 
-    public function getIndexPage($title, $message, $username)
+    public function getIndexPage()
     {
 
+
         $date = $this->getDate();
+
+        if (isset($_POST['username']))
+        {
+            $username = ($_POST['username']);
+        }
+        else {
+            $username = "";
+        }
+
         if (isset($_SESSION[$this->message]))
         {
             $message = $_SESSION[$this->message];
@@ -34,7 +43,7 @@ class HTMLview {
             <head>
                 <meta http-equiv='Content-Type'
                 content='text/html; charset=UTF-8'>
-                <title>$title</title>
+                <title>$message</title>
             </head>
             <body>
             <h2>Ej inloggad</h2>
@@ -44,7 +53,7 @@ class HTMLview {
                 <input type='text' name='username' value='$username'>
                 <label>Password</label>
                 <input type='password' name='password'>
-                <input type='submit' value='submit'>
+                <input type='submit' name='submit' value='submit'>
             </form>
                 <p>$date</p>
             </body>
@@ -52,7 +61,7 @@ class HTMLview {
         ";
     }
 
-    public function getAdminPage ($title, $message)
+    public function getAdminPage ()
     {
         if (isset($_SESSION[$this->message]))
         {
@@ -68,7 +77,7 @@ class HTMLview {
             <head>
                 <meta http-equiv='Content-Type'
                 content='text/html; charset=UTF-8'>
-                <title>$title</title>
+                <title>Inloggad</title>
             </head>
             <body>
             <h2>Inloggad</h2>
@@ -158,13 +167,19 @@ class HTMLview {
     {
         if (isset($_POST['username']))
         {
-            return $_POST['username'];
+            if(strlen($_POST['username'])>0)
+            {
+                return $_POST['username'];
+            }
+
+            else{
+                throw new \Exception("Användarnamn saknas");
+            }
         }
         else
         {
-            return "";
+            throw new \Exception("Något blev fel vid inloggningen, vänligen försök igen");
         }
-
     }
 
 
@@ -172,11 +187,19 @@ class HTMLview {
     {
         if (isset($_POST['password']))
         {
-        return $_POST['password'];
+            if(strlen($_POST['password'])>0)
+            {
+                return $_POST['password'];
+            }
+
+            else{
+                throw new \Exception("Lösenord saknas");
+            }
+
         }
         else
         {
-            return "";
+            throw new \Exception("Något blev fel vid inloggningen, vänligen försök igen");
         }
 
 
@@ -193,6 +216,10 @@ class HTMLview {
         return isset($_GET['logout']);
     }
 
+    public function isSubmitted()
+    {
+        return isset($_POST['submit']);
+    }
     public function setLogoutMessageSession()
     {
         $_SESSION[$this->message] = $this->logoutMessage;
@@ -201,6 +228,11 @@ class HTMLview {
     public function setLoginMessageSession()
     {
         $_SESSION[$this->message] = $this->loginMessage;
+    }
+
+    public function setErrorMessageSession($errorMsg)
+    {
+        $_SESSION[$this->message] = $errorMsg;
     }
 
     public function unsetMessageSession()
