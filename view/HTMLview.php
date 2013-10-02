@@ -15,15 +15,20 @@ class HTMLview {
     private $logoutMessage = "Du har loggats uuuut";
     private $message = "message";
 
+    const username = 'username';
+    const password = 'password';
+    const login = 'login';
+    const logout = 'logout';
+    const submit = 'submit';
+    const checkbox = 'checkbox';
+
     public function getIndexPage()
     {
-
-
         $date = $this->getDate();
 
-        if (isset($_POST['username']))
+        if (isset($_POST[self::username]))
         {
-            $username = ($_POST['username']);
+            $username = ($_POST[self::username]);
         }
         else {
             $username = "";
@@ -53,6 +58,7 @@ class HTMLview {
                 <input type='text' name='username' value='$username'>
                 <label>Password</label>
                 <input type='password' name='password'>
+                <input type='checkbox' name='checkbox'>
                 <input type='submit' name='submit' value='submit'>
             </form>
                 <p>$date</p>
@@ -165,11 +171,11 @@ class HTMLview {
 
     public function getUsernamePost()
     {
-        if (isset($_POST['username']))
+        if (isset($_POST[self::username]))
         {
-            if(strlen($_POST['username'])>0)
+            if(strlen($_POST[self::username])>0)
             {
-                return $_POST['username'];
+                return $_POST[self::username];
             }
 
             else{
@@ -185,11 +191,11 @@ class HTMLview {
 
     public function getPasswordPost()
     {
-        if (isset($_POST['password']))
+        if (isset($_POST[self::password]))
         {
-            if(strlen($_POST['password'])>0)
+            if(strlen($_POST[self::password])>0)
             {
-                return $_POST['password'];
+                return $_POST[self::password];
             }
 
             else{
@@ -207,19 +213,23 @@ class HTMLview {
 
     public function isLoggingIn()
     {
-        return isset($_GET['login']);
-
+        return isset($_GET[self::login]);
     }
 
     public function isLoggingOut()
     {
-        return isset($_GET['logout']);
+        return isset($_GET[self::logout]);
     }
 
     public function isSubmitted()
     {
-        return isset($_POST['submit']);
+        return isset($_POST[self::submit]);
     }
+    public function isRememberMe()
+    {
+        return isset($_POST[self::checkbox]);
+    }
+
     public function setLogoutMessageSession()
     {
         $_SESSION[$this->message] = $this->logoutMessage;
@@ -239,6 +249,9 @@ class HTMLview {
     {
         unset($_SESSION[$this->message]);
     }
+
+
+
 
 
 

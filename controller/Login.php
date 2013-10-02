@@ -50,13 +50,14 @@ class Login {
             return $this->HTMLview->getIndexPage();
         }
 
-
     }
 
     public function validateLogin()
     {
         try {
+            $this->userModel->setCookieOrNot($this->HTMLview->isRememberMe());
             $this->userModel->userValidation($this->HTMLview->getUsernamePost(), $this->HTMLview->getPasswordPost());
+
             $this->HTMLview->setLoginMessageSession();
             return $this->HTMLview->getAdminPage();
         }
@@ -66,9 +67,6 @@ class Login {
             return $this->HTMLview->getIndexPage();
         }
 
-
     }
-
-
 
 }
