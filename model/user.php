@@ -12,7 +12,7 @@ namespace model;
 
 class user {
 
-    private $setCookie = false;
+
     private static $CorrectUser = "axel";
     private static $CorrectPassword = "losenord";
     const loggedIn = "LoggedIn";
@@ -31,10 +31,6 @@ class user {
         if($username == $this->getUserName() && $password == $this->getPassword())
         {
           $this->setSession();
-            if($this->setCookie)
-            {
-                $this->setCookie();
-            }
             return true;
         }
         else{
@@ -54,32 +50,7 @@ class user {
     //TODO Fixa koll på kaka också
     public function isLoggedIn()
     {
-         if(isset($_SESSION[self::loggedIn])||isset($_COOKIE['user']))
-         {
-             return true;
-         }
-         else
-         {
-             return false;
-         }
-
-    }
-
-    public function setCookieOrNot ($bool)
-    {
-        if($bool){
-         $this->setCookie = true;
-        }
-        else
-        {
-            $this->setCookie = false;
-        }
-
-    }
-
-    public function setCookie()
-    {
-        setcookie("user", "sklasgyoeksg", time() + 200000);
+        return isset($_SESSION[self::loggedIn]);
     }
 
 

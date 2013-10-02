@@ -35,14 +35,25 @@ class Login {
             $this->userModel->unsetSession();
             $this->HTMLview->setLogoutMessageSession();
             }
+            if ($this->HTMLview->isCookieValid())
+            {
+                $this->HTMLview->unsetCookie();
+            }
             return $this->HTMLview->getIndexPage();
         }
         else if ($this->userModel->isLoggedIn())
         {
             return $this->HTMLview->getAdminPage();
         }
+        else if ($this->HTMLview->isCookieValid())
+        {
+            $this->HTMLview->setCookieLoginSuccessMessage();
+            $this->userModel->setSession();
+            return $this->HTMLview->getAdminPage();
+        }
         else if ($this->HTMLview->isLoggingIn() && $this->HTMLview->isSubmitted())
         {
+
             return $this->validateLogin();
         }
         else
@@ -50,15 +61,19 @@ class Login {
             return $this->HTMLview->getIndexPage();
         }
 
+
     }
 
     public function validateLogin()
     {
         try {
-            $this->userModel->setCookieOrNot($this->HTMLview->isRememberMe());
             $this->userModel->userValidation($this->HTMLview->getUsernamePost(), $this->HTMLview->getPasswordPost());
-
             $this->HTMLview->setLoginMessageSession();
+            if ($this->HTMLview->isRememberMe())
+            {
+                $this->HTMLview->setCookie();
+                $this->HTMLview->setCookieLoginMessage();
+            }
             return $this->HTMLview->getAdminPage();
         }
         catch (\Exception $e)
@@ -67,6 +82,9 @@ class Login {
             return $this->HTMLview->getIndexPage();
         }
 
+
     }
+
+
 
 }

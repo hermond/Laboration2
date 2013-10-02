@@ -55,11 +55,12 @@ class HTMLview {
                 <p>$message</p>
                 <form action='?login' method='post' >
                 <label>Username</label>
-                <input type='text' name='username' value='$username'>
+                <input type='text' name=".self::username." value='$username'>
                 <label>Password</label>
-                <input type='password' name='password'>
-                <input type='checkbox' name='checkbox'>
-                <input type='submit' name='submit' value='submit'>
+                <input type='password' name=".self::password.">
+                <label>Remember me</label>
+                <input type='checkbox' name=".self::checkbox.">
+                <input type='submit' name=".self::submit." value='submit'>
             </form>
                 <p>$date</p>
             </body>
@@ -245,11 +246,35 @@ class HTMLview {
         $_SESSION[$this->message] = $errorMsg;
     }
 
+    public function setCookieLoginMessage()
+    {
+        $_SESSION[$this->message] = "Du har loggat in med cookie, vi kommer ihåg dig nästa gång";
+    }
+
+    public function setCookieLoginSuccessMessage()
+    {
+        $_SESSION[$this->message] = "inloggningen lyckades med cookies";
+    }
+
     public function unsetMessageSession()
     {
         unset($_SESSION[$this->message]);
     }
 
+    public function setCookie()
+    {
+        setcookie("user", "kjlsgoyKHLouksg", time() + 20000);
+    }
+
+    public function unsetCookie()
+    {
+        setcookie("user","", time() - 360000);
+    }
+
+    public function isCookieValid()
+    {
+        return isset($_COOKIE["user"]);
+    }
 
 
 
