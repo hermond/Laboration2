@@ -12,6 +12,8 @@ require_once("view/HTMLview.php");
 require_once("controller/Login.php");
 
 session_start();
-
+/**
+ * @var object
+ */
 $Login = new \controller\Login();
 echo $Login->Controll();

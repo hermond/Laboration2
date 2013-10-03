@@ -11,39 +11,57 @@ namespace view;
 
 
 class HTMLview {
-    private $loginMessage = "Du har loggats in";
-    private $logoutMessage = "Du har loggats uuuut";
-    private $message = "message";
+    /**
+     * @var String messages for user feedback
+     */
+    private static $loginMessage = "Du har loggats in";
+    private static $logoutMessage = "Du har loggats uuuut";
+    private static $rememberMeMessage = "Du har loggat in med cookie,
+     vi kommer ihåg dig nästa gång";
+    private static $cookieLoginSuccessMessage = "Inloggningen med cookies";
 
-    const username = 'username';
-    const password = 'password';
-    const login = 'login';
-    const logout = 'logout';
-    const submit = 'submit';
-    const checkbox = 'checkbox';
+    /**
+     * @var String for location in $_SESSION
+     */
+    private static $message = "message";
 
+    /**
+     * @var String for locations in $_POST
+     */
+    private static $username = 'username';
+    private static $password = 'password';
+    private static $submit = 'submit';
+    private static $checkbox = 'checkbox';
+
+    /**
+     * @var String for locations in $_GET
+     */
+    private static $login = 'login';
+    private static $logout = 'logout';
+
+    /**
+     * @var String for cookie and location in $_COOKIE
+     */
+    private static $cookie = "user";
+    /**
+     * @var String for filename
+     */
+    private static $fileName = "cookie.txt";
+
+    /**
+     * @var String for Cookie-token
+     */
+    private static $cookieToken = "klsgKOI%zOYXKyD%";
+
+    /**
+     * @return string with HTML for Indexpage
+     */
     public function getIndexPage()
     {
         $date = $this->getDate();
-
-        if (isset($_POST[self::username]))
-        {
-            $username = ($_POST[self::username]);
-        }
-        else {
-            $username = "";
-        }
-
-        if (isset($_SESSION[$this->message]))
-        {
-            $message = $_SESSION[$this->message];
-            $this->unsetMessageSession();
-        }
-        else{
-            $message = "Välkommen";
-        }
-        return "
-        <!DOCTYPE html>
+        $username = $this->getUsername();
+        $message = $this->getMessage();
+        return "<!DOCTYPE html>
         <html>
             <head>
                 <meta http-equiv='Content-Type'
@@ -53,33 +71,28 @@ class HTMLview {
             <body>
             <h2>Ej inloggad</h2>
                 <p>$message</p>
-                <form action='?login' method='post' >
+                <form action='?". self::$login . "' method='post' >
                 <label>Username</label>
-                <input type='text' name=".self::username." value='$username'>
+                <input type='text' name=".self::$username." value='$username'>
                 <label>Password</label>
-                <input type='password' name=".self::password.">
+                <input type='password' name=".self::$password.">
                 <label>Remember me</label>
-                <input type='checkbox' name=".self::checkbox.">
-                <input type='submit' name=".self::submit." value='submit'>
-            </form>
+                <input type='checkbox' name=".self::$checkbox.">
+                <input type='submit' name=".self::$submit." value='submit'>
+                </form>
                 <p>$date</p>
             </body>
-        </html>
-        ";
+        </html>";
     }
 
+    /**
+     * @return string HTML for Admin page
+     */
     public function getAdminPage ()
     {
-        if (isset($_SESSION[$this->message]))
-        {
-            $message = $_SESSION[$this->message];
-            $this->unsetMessageSession();
-        }
-        else{
-         $message = "Välkommen";
-        }
+      $message = $this->getMessage();
         return
-            "<!DOCTYPE html>
+        "<!DOCTYPE html>
         <html>
             <head>
                 <meta http-equiv='Content-Type'
@@ -89,195 +102,237 @@ class HTMLview {
             <body>
             <h2>Inloggad</h2>
                 <p>$message</p>
-            <form action='?logout' method='post' >
+            <form action='?".self::$logout."' method='post' >
                 <input type='submit' value='Logout'>
             </form>
             </body>
         </html>";
     }
 
+    /**
+     * @return string with date in swedish format
+     */
     private static function getDate()
     {
+        $dayArray = array(1=>"Måndag", "Tisdag", "Onsdag", "Torsdag",
+        "Fredag", "Lördag", "Söndag");
 
-        switch(date("N"))
-        {
-            case "1":
-                $day = "Måndag";
-                break;
-            case "2":
-                $day = "Tisdag";
-                break;
-            case "3":
-                $day = "Onsdag";
-                break;
-            case "4":
-                $day = "Torsdag";
-                break;
-            case "5":
-                $day = "Fredag";
-                break;
-            case "6":
-                $day = "Lördag";
-                break;
-            case "7":
-                $day = "Söndag";
-                break;
-        }
+        $day= $dayArray[date("N")];
 
-        switch (date("n"))
-        {
-            case "1":
-                $month = "Januari";
-                break;
-            case "2":
-                $month = "Februari";
-                break;
-            case "3":
-                $month = "Mars";
-                break;
-            case "4":
-                $month = "April";
-                break;
-            case "5":
-                $month = "Maj";
-                break;
-            case "6":
-                $month = "Juni";
-                break;
-            case "7":
-                $month = "Juli";
-                break;
-            case "8":
-                $month = "Augusti";
-                break;
-            case "9":
-                $month = "September";
-                break;
-            case "10":
-                $month = "Oktober";
-                break;
-            case "11":
-                $month = "November";
-                break;
-            case "12":
-                $month = "December";
-                break;
-        }
+        $monthArray = array(1=>"Januari","Februari","Mars","April","Maj",
+            "Juni","Juli","Augusti","September","Oktober", "November",
+            "December");
+
+        $month = $monthArray[date("n")];
 
         return $day . ", den " . date("d") . " " . $month .
         " år " .  date("Y") .". Klockan är [" . date("H") .
         ":" . date("i") . ":" . date("s") . "]";
-
     }
 
+    /**
+     * @return string
+     */
+    private function getMessage()
+    {
+        if (isset($_SESSION[self::$message]))
+        {
+            $message = $_SESSION[self::$message];
+            $this->unsetMessageSession();
+        }
+        else{
+            $message = "Välkommen";
+        }
+        return $message;
+    }
+
+    /**
+     * @return string
+     */
+    private function getUsername()
+    {
+        if (isset($_POST[self::$username]))
+        {
+            $username = ($_POST[self::$username]);
+        }
+        else {
+            $username = "";
+        }
+        return $username;
+    }
+
+    /**
+     * @return string from $_POST with username.
+     * @throws /Exception if username is missing
+     * @throws /Exception if _$POST is empty
+     */
     public function getUsernamePost()
     {
-        if (isset($_POST[self::username]))
+        if (isset($_POST[self::$username]))
         {
-            if(strlen($_POST[self::username])>0)
+            if(strlen($_POST[self::$username])>0)
             {
-                return $_POST[self::username];
+                return $_POST[self::$username];
             }
-
             else{
                 throw new \Exception("Användarnamn saknas");
             }
         }
         else
         {
-            throw new \Exception("Något blev fel vid inloggningen, vänligen försök igen");
+            throw new \Exception("Något blev fel vid inloggningen,
+            vänligen försök igen");
         }
     }
 
-
+    /**
+     * @return string from $_POST with password.
+     * @throws /Exception if password is missing
+     * @throws /Exception if _$POST is empty
+     */
     public function getPasswordPost()
     {
-        if (isset($_POST[self::password]))
+        if (isset($_POST[self::$password]))
         {
-            if(strlen($_POST[self::password])>0)
+            if(strlen($_POST[self::$password])>0)
             {
-                return $_POST[self::password];
+                return $_POST[self::$password];
             }
-
             else{
                 throw new \Exception("Lösenord saknas");
             }
-
         }
         else
         {
-            throw new \Exception("Något blev fel vid inloggningen, vänligen försök igen");
+            throw new \Exception("Något blev fel vid inloggningen,
+            vänligen försök igen");
         }
-
-
     }
 
+
+    /**
+     * @return bool
+     */
     public function isLoggingIn()
     {
-        return isset($_GET[self::login]);
+        return isset($_GET[self::$login]);
     }
 
+    /**
+     * @return bool
+     */
     public function isLoggingOut()
     {
-        return isset($_GET[self::logout]);
+        return isset($_GET[self::$logout]);
     }
 
+    /**
+     * @return bool
+     */
     public function isSubmitted()
     {
-        return isset($_POST[self::submit]);
+        return isset($_POST[self::$submit]);
     }
+
+    /**
+     * @return bool
+     */
     public function isRememberMe()
     {
-        return isset($_POST[self::checkbox]);
+        return isset($_POST[self::$checkbox]);
     }
 
+    /**
+     * Sets the logout feedback message
+     */
     public function setLogoutMessageSession()
     {
-        $_SESSION[$this->message] = $this->logoutMessage;
+        $_SESSION[self::$message] = self::$logoutMessage;
     }
 
+    /**
+     * Sets the login feedback message
+     */
     public function setLoginMessageSession()
     {
-        $_SESSION[$this->message] = $this->loginMessage;
+        $_SESSION[self::$message] = self::$loginMessage;
     }
 
+    /**
+     * @param String $errorMsg
+     */
     public function setErrorMessageSession($errorMsg)
     {
-        $_SESSION[$this->message] = $errorMsg;
+        $_SESSION[self::$message] = $errorMsg;
     }
 
+    /**
+     * Sets the remember me feedback message
+     */
     public function setCookieLoginMessage()
     {
-        $_SESSION[$this->message] = "Du har loggat in med cookie, vi kommer ihåg dig nästa gång";
+        $_SESSION[self::$message] = self::$rememberMeMessage;
     }
 
+    /**
+     * Sets the cookie login success feedback message
+     */
     public function setCookieLoginSuccessMessage()
     {
-        $_SESSION[$this->message] = "inloggningen lyckades med cookies";
+        $_SESSION[self::$message] = self::$cookieLoginSuccessMessage;
     }
-
+    /**
+     * Unsets the (all) feedback message
+     */
     public function unsetMessageSession()
     {
-        unset($_SESSION[$this->message]);
+        unset($_SESSION[self::$message]);
     }
 
+    /**
+     * Sets the remember me-cookie
+     */
     public function setCookie()
     {
-        setcookie("user", "kjlsgoyKHLouksg", time() + 20000);
+        $time = time() + 50;
+        file_put_contents(self::$fileName, $time);
+        setcookie(self::$cookie, self::$cookieToken, $time);
     }
 
+    /**
+     * Unsets the remember me-cookie
+     */
     public function unsetCookie()
     {
-        setcookie("user","", time() - 360000);
+        setcookie(self::$cookie,"", time() - 360000);
     }
 
+    /**
+     * @return bool
+     * @throws /Exception if the user is not valid
+     */
     public function isCookieValid()
     {
-        return isset($_COOKIE["user"]);
+
+            $timeInFile = file_get_contents(self::$fileName);
+
+             if($_COOKIE[self::$cookie] !== self::$cookieToken
+                 || $timeInFile < time() )
+            {
+                throw new \Exception("Felaktig information i kakan!");
+            }
+            else
+            {
+                return true;
+            }
     }
 
-
-
-
+    /**
+     * @return bool
+     */
+    public function isThereACookie()
+    {
+        return isset($_COOKIE[self::$cookie]);
+    }
 
 }
